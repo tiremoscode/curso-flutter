@@ -30,6 +30,7 @@ class _FormularioDatosState extends State<FormularioDatos> {
     _nombreController.clear();
     _emailController.clear();
     _aceptoTerminos = false;
+     FocusScope.of(context).unfocus();//unfocus the text fields and hide the keyboard.
   }
 
   void _enviarFormulario() {
