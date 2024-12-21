@@ -30,6 +30,7 @@ class _FormularioDatosState extends State<FormularioDatos> {
     _nombreController.clear();
     _emailController.clear();
     _aceptoTerminos = false;
+    WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
   }
 
   void _enviarFormulario() {
