@@ -31,6 +31,7 @@ class _FormularioDatosState extends State<FormularioDatos> {
     _emailController.clear();
     _aceptoTerminos = false;
     WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
+    FocusScope.of(context).unfocus();//unfocus the text fields and hide the keyboard.
   }
 
   void _enviarFormulario() {
