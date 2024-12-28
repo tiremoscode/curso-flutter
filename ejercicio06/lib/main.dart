@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,53 +9,52 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: CustomDialogEjemplo(),
+      home: AlmacenamientoEjemplo(),
     );
   }
 }
 
-class CustomDialogEjemplo extends StatelessWidget {
+class AlmacenamientoEjemplo extends StatefulWidget {
+  @override
+  _AlmacenamientoEjemploState createState() => _AlmacenamientoEjemploState();
+}
+
+class _AlmacenamientoEjemploState extends State<AlmacenamientoEjemplo> {
+  String datoAlmacenado = '';
+
+  Future<void> guardarDatos(String data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('key', data);
+    setState(() {
+      datoAlmacenado = data;
+    });
+  }
+
+  Future<void> leerDatosExistentes() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      datoAlmacenado = prefs.getString('key') ?? 'No hay datos';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Custom dialog ejemplo')),
-        body: Center(
-            child: ElevatedButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Container(
-                        padding: EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Titulo personalizado',
-                                style: TextStyle(
-                                    fontSize: 30, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 30),
-                            Text('Este es un modal/alert personalizado'),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  child: Text('Cerrar'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                )
-                              ],
-                            ),
-                          ],
-                        )),
-                  );
-                });
-          },
-          child: Text('Mostrar custom dialog'),
-        )));
+      appBar: AppBar(title: Text('Persistencia de datos')),
+      body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                onSubmitted: (value) => guardarDatos(value),
+              ),
+              ElevatedButton(
+                child: Text('Leer dato existentes'),
+                onPressed: leerDatosExistentes,
+              ),
+              Text('Datos almacenados?: $datoAlmacenado')
+            ],
+          )),
+    );
   }
 }
