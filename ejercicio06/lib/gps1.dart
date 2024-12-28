@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,20 +9,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: GPSMapa(),
+      home: GPSEjemplo(),
     );
   }
 }
 
-class GPSMapa extends StatefulWidget {
+class GPSEjemplo extends StatefulWidget {
   @override
-  _GPSMapaState createState() => _GPSMapaState();
+  _GPSEjemploState createState() => _GPSEjemploState();
 }
 
-class _GPSMapaState extends State<GPSMapa> {
-  late MapboxMapController _mapController;
-  final String _mapboxToken =
-      'pk.eyJ1IjoiYWxiZXJ0b2x1ZWJiZXJ0IiwiYSI6ImNtNThsbzFrYjNuY3cybHB6Mm9ib3J5cmgifQ.cKCxAlykTcCMG6gW3GZ_tg';
+class _GPSEjemploState extends State<GPSEjemplo> {
   LocationData? _currentLocation;
   final Location _location = Location();
 
@@ -46,15 +42,13 @@ class _GPSMapaState extends State<GPSMapa> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Mi ubicación actual')),
-        body: Center(
-          child: _currentLocation == null
-              ? Text('Obteniendo tu ubicación')
-              : MapboxMap(
-                  accessToken: _mapboxToken,
-                  initialCameraPosition: CameraPosition(
-                      zoom: 14, target: LatLng(19.432608, -99.133209)),
-                ),
-        ));
+      appBar: AppBar(title: Text('Mi ubicación actual')),
+      body: Center(
+        child: _currentLocation == null
+            ? Text('Obteniendo tu ubicación')
+            : Text(
+                'Latitud: ${_currentLocation!.latitude}, Longitud: ${_currentLocation!.longitude}'),
+      ),
+    );
   }
 }
