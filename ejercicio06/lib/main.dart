@@ -1,60 +1,106 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:camera/camera.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    final cameras = await availableCameras();
+
+    if (cameras.isEmpty) {
+      runApp(ErrorApp(message: 'No se encontraron cámaras disponibles.'));
+      return;
+    }
+
+    final firstCamera = cameras.first;
+    runApp(MyApp(camera: firstCamera));
+  } catch (e) {
+    runApp(ErrorApp(message: 'Error al inicializar las cámaras: $e'));
+  }
 }
 
 class MyApp extends StatelessWidget {
+  final CameraDescription camera;
+
+  MyApp({required this.camera});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: GPSMapa(),
+      home: EjemploCamara(camera: camera),
     );
   }
 }
 
-class GPSMapa extends StatefulWidget {
+class EjemploCamara extends StatefulWidget {
+  final CameraDescription camera;
+
+  EjemploCamara({required this.camera});
+
   @override
-  _GPSMapaState createState() => _GPSMapaState();
+  _EjemploCamaraState createState() => _EjemploCamaraState();
 }
 
-class _GPSMapaState extends State<GPSMapa> {
-  late MapboxMapController _mapController;
-  final String _mapboxToken =
-      'pk.eyJ1IjoiYWxiZXJ0b2x1ZWJiZXJ0IiwiYSI6ImNtNThsbzFrYjNuY3cybHB6Mm9ib3J5cmgifQ.cKCxAlykTcCMG6gW3GZ_tg';
-  LocationData? _currentLocation;
-  final Location _location = Location();
+class _EjemploCamaraState extends State<EjemploCamara> {
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
 
   @override
   void initState() {
     super.initState();
-    _getLocation();
+    _controller = CameraController(widget.camera, ResolutionPreset.high);
+    _initializeControllerFuture = _controller.initialize();
   }
 
-  Future<void> _getLocation() async {
-    final permisoConcedido = await _location.requestPermission();
-    if (permisoConcedido == PermissionStatus.granted) {
-      final locationData = await _location.getLocation();
-      setState(() {
-        _currentLocation = locationData;
-      });
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Mi ubicación actual')),
-        body: Center(
-          child: _currentLocation == null
-              ? Text('Obteniendo tu ubicación')
-              : MapboxMap(
-                  accessToken: _mapboxToken,
-                  initialCameraPosition: CameraPosition(
-                      zoom: 14, target: LatLng(19.432608, -99.133209)),
-                ),
-        ));
+      appBar: AppBar(title: Text('Tomando una foto con la cámara')),
+      body: FutureBuilder(
+          future: _initializeControllerFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return CameraPreview(_controller);
+            } else {
+              return Center(child: Text('No disponible'));
+            }
+          }),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.camera),
+        onPressed: () async {
+          try {
+            await _initializeControllerFuture;
+
+            final image = await _controller.takePicture();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Foto guardada en ${image.path}')),
+            );
+          } catch (error) {
+            print('error $error');
+          }
+        },
+      ),
+    );
+  }
+}
+
+class ErrorApp extends StatelessWidget {
+  final String message;
+
+  ErrorApp({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text('Error')),
+        body: Center(child: Text(message)),
+      ),
+    );
   }
 }
