@@ -21,10 +21,9 @@ class DeleteEjemplo extends StatefulWidget {
 }
 
 class _DeleteEjemploState extends State<DeleteEjemplo> {
-  Future<void> eliminarAlumno() async {
+  Future<void> eliminarRegistro() async {
     final response = await http.delete(
-      Uri.parse(
-          'https://vgqvdvwkv5.execute-api.us-east-1.amazonaws.com/alumnas/3'),
+      Uri.parse('https://jsonplaceholder.typicode.com/posts/1'),
     );
 
     if (response.statusCode == 200) {
@@ -42,8 +41,8 @@ class _DeleteEjemploState extends State<DeleteEjemplo> {
         appBar: AppBar(title: Text('Solicitud Delete')),
         body: Center(
             child: ElevatedButton(
-          onPressed: eliminarAlumno,
-          child: Text('Eliminar Alumno'),
+          onPressed: eliminarRegistro,
+          child: Text('Eliminar Registro'),
         )));
   }
 }
