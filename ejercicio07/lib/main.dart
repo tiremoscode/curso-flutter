@@ -10,40 +10,72 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DeleteEjemplo(),
+      home: ListaDeUsuarios(),
     );
   }
 }
 
-class DeleteEjemplo extends StatefulWidget {
+class ListaDeUsuarios extends StatefulWidget {
   @override
-  _DeleteEjemploState createState() => _DeleteEjemploState();
+  _ListaDeUsuariosState createState() => _ListaDeUsuariosState();
 }
 
-class _DeleteEjemploState extends State<DeleteEjemplo> {
-  Future<void> eliminarAlumno() async {
-    final response = await http.delete(
-      Uri.parse(
-          'https://vgqvdvwkv5.execute-api.us-east-1.amazonaws.com/alumnas/3'),
-    );
+class _ListaDeUsuariosState extends State<ListaDeUsuarios> {
+  List listaUsuarios = [];
+  bool isLoading = false;
+
+  // Metoo para conumir la API
+  Future<void> obtenerUsuarios() async {
+    print('obteniendo usuarios...');
+    setState(() {
+      isLoading = true;
+    });
+
+    final response =
+        await http.get(Uri.parse('https://reqres.in/api/users?page=2'));
 
     if (response.statusCode == 200) {
-      print('Datos eliminados correctamente');
-      print('Response servicio ${response.body}');
+      print('Datos correctos');
+      final data = json.decode(response.body);
+      setState(() {
+        listaUsuarios = data['data'];
+      });
     } else {
-      print('Error al enviar los datos para eliminar');
-      print('Response servicio ${response.body}');
+      print('No se pudo conectar');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar los usuarios')),
+      );
     }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    obtenerUsuarios();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Solicitud Delete')),
-        body: Center(
-            child: ElevatedButton(
-          onPressed: eliminarAlumno,
-          child: Text('Eliminar Alumno'),
-        )));
+        appBar: AppBar(title: Text('Lista de Usuarios')),
+        body: isLoading
+            ? Center(child: Text('Cargando,espere por favor'))
+            : ListView.builder(
+                itemCount: listaUsuarios.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(listaUsuarios[index]['avatar']),
+                      ),
+                      title: Text(
+                          '${listaUsuarios[index]['first_name']} ${listaUsuarios[index]['last_name']}'),
+                      subtitle: Text(listaUsuarios[index]['email']));
+                },
+              ));
   }
 }
