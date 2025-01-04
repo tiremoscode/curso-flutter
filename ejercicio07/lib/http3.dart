@@ -10,27 +10,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DeleteEjemplo(),
+      home: PutEjemplo(),
     );
   }
 }
 
-class DeleteEjemplo extends StatefulWidget {
+class PutEjemplo extends StatefulWidget {
   @override
-  _DeleteEjemploState createState() => _DeleteEjemploState();
+  _PutEjemploState createState() => _PutEjemploState();
 }
 
-class _DeleteEjemploState extends State<DeleteEjemplo> {
-  Future<void> eliminarRegistro() async {
-    final response = await http.delete(
+class _PutEjemploState extends State<PutEjemplo> {
+  Future<void> actualizarRegistro() async {
+    final response = await http.put(
       Uri.parse('https://jsonplaceholder.typicode.com/posts/1'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'title': 'Actualizacion de datos',
+      }),
     );
 
     if (response.statusCode == 200) {
-      print('Datos eliminados correctamente');
+      print('Datos actualizados correctamente');
       print('Response servicio ${response.body}');
     } else {
-      print('Error al enviar los datos para eliminar');
+      print('Error al enviar los datos');
       print('Response servicio ${response.body}');
     }
   }
@@ -38,11 +42,11 @@ class _DeleteEjemploState extends State<DeleteEjemplo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Solicitud Delete')),
+        appBar: AppBar(title: Text('Solicitud Put')),
         body: Center(
             child: ElevatedButton(
-          onPressed: eliminarRegistro,
-          child: Text('Eliminar Registro'),
+          onPressed: actualizarRegistro,
+          child: Text('Actualizar Registro'),
         )));
   }
 }
