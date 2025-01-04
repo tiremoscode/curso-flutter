@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "422285872338",
+    "project_id": "curso-flutter-tg",
+    "storage_bucket": "curso-flutter-tg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422285872338:android:6366514b887c9971dab10b",
+        "android_client_info": {
+          "package_name": "com.example.ejercicio07"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApI95X5YlZRZ8OlPe16vbEqh6Wx0SMPIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
